@@ -1,0 +1,122 @@
+[
+  {
+    "id": "menu_drip_deep",
+    "name": "深煎りドリップ",
+    "category": "drip",
+    "price": 280,
+    "profile": {
+      "taste": ["bitter", "rich"],
+      "scene": ["focus", "meeting", "morning"],
+      "mood": ["wake", "focus"]
+    },
+    "description": "深いコクと余韻、集中したい朝に。"
+  },
+  {
+    "id": "menu_drip_light",
+    "name": "浅煎りハンドドリップ",
+    "category": "drip",
+    "price": 320,
+    "profile": {
+      "taste": ["acid", "fruity"],
+      "scene": ["focus", "chat"],
+      "mood": ["lift", "focus"]
+    },
+    "description": "華やかな酸味とフルーティな後味で気分をリフレッシュ。"
+  },
+  {
+    "id": "menu_espresso_single",
+    "name": "エスプレッソ",
+    "category": "espresso",
+    "price": 260,
+    "profile": {
+      "taste": ["bitter", "rich"],
+      "scene": ["focus", "morning"],
+      "mood": ["wake", "lift"]
+    },
+    "description": "30秒で気持ちを切り替える、濃縮された一杯。"
+  },
+  {
+    "id": "menu_espresso_double",
+    "name": "ダブルエスプレッソ",
+    "category": "espresso",
+    "price": 320,
+    "profile": {
+      "taste": ["bitter", "rich"],
+      "scene": ["focus", "meeting"],
+      "mood": ["wake", "focus"]
+    },
+    "description": "重要な打ち合わせ前に、覚醒の一撃を。"
+  },
+  {
+    "id": "menu_latte",
+    "name": "カフェラテ",
+    "category": "milk",
+    "price": 350,
+    "profile": {
+      "taste": ["milk", "sweet"],
+      "scene": ["chat", "morning", "break"],
+      "mood": ["relax", "lift"]
+    },
+    "description": "ふわっとしたミルクで、心と頭をやわらかく。"
+  },
+  {
+    "id": "menu_cappuccino",
+    "name": "カプチーノ",
+    "category": "milk",
+    "price": 350,
+    "profile": {
+      "taste": ["milk", "rich"],
+      "scene": ["chat", "break"],
+      "mood": ["relax", "lift"]
+    },
+    "description": "きめ細かい泡と濃いめのエスプレッソが調和する一杯。"
+  },
+  {
+    "id": "menu_mocha",
+    "name": "カフェモカ",
+    "category": "sweet",
+    "price": 380,
+    "profile": {
+      "taste": ["sweet", "milk"],
+      "scene": ["break", "chat"],
+      "mood": ["relax", "lift"]
+    },
+    "description": "チョコのコクが疲れた午後にしみるご褒美。"
+  },
+  {
+    "id": "menu_americano",
+    "name": "アメリカーノ",
+    "category": "drip",
+    "price": 260,
+    "profile": {
+      "taste": ["bitter"],
+      "scene": ["focus", "meeting"],
+      "mood": ["focus", "wake"]
+    },
+    "description": "すっきりとした飲み口で、長時間の作業にも。"
+  },
+  {
+    "id": "menu_cold_brew",
+    "name": "コールドブリュー",
+    "category": "cold",
+    "price": 340,
+    "profile": {
+      "taste": ["acid", "fruity"],
+      "scene": ["focus", "break"],
+      "mood": ["lift", "relax"]
+    },
+    "description": "じっくり抽出した、まろやかなアイスコーヒー。"
+  },
+  {
+    "id": "menu_iced_latte",
+    "name": "アイスラテ",
+    "category": "cold",
+    "price": 360,
+    "profile": {
+      "taste": ["milk", "sweet"],
+      "scene": ["break", "chat"],
+      "mood": ["relax", "lift"]
+    },
+    "description": "ミルクとコーヒーが層を作る、見た目も心地よい一杯。"
+  }
+]
