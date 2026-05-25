@@ -1,4 +1,5 @@
 import type {
+  AdminSummary,
   DepartmentAnswers,
   MeetingAnswers,
   PersonalAnswers,
@@ -93,6 +94,47 @@ export function buildMeetingMessages(a: MeetingAnswers) {
     {
       role: "user" as const,
       content: `会議タイプ: ${a.meetingType}\n参加人数: ${a.attendees}\n時間帯: ${a.timing}\n\nこの会議に最適なコーヒー提供プランを設計してください。`,
+    },
+  ];
+}
+
+const SYSTEM_ADMIN_INSIGHT = `あなたはオフィスの総務担当に寄り添う、データに強い経営アナリストです。
+渡された当月のオフィスコーヒー利用集計データを読み解き、総務向けに簡潔に要約してください。
+
+出力は必ず以下のセクション構成で、合計 200〜300字程度の日本語で書いてください。
+広告くさい言い回し・絵文字・前置き・あいさつは禁止です。
+セクションタイトルの記号や順番は厳密に守ってください。
+社名・固有のメーカー名・URLは絶対に出さないでください。
+
+【今月の傾向】 …… 数字の事実を 2 つだけ簡潔に（60〜90字）
+【気付き】 …… ピーク時間・部署偏り・上限超過などの運用上の発見を 1 つ（60〜100字）
+【次月への提案】 …… 総務として実行可能な改善案を 1 つ（70〜110字）`;
+
+export function buildAdminInsightMessages(s: AdminSummary) {
+  const topDepts = s.topDepartments
+    .slice(0, 3)
+    .map((d) => `${d.name}:${d.cups}杯(${(d.share * 100).toFixed(0)}%)`)
+    .join(", ");
+  const topMenus = s.topMenus
+    .slice(0, 3)
+    .map((m) => `${m.name}:${m.cups}杯`)
+    .join(", ");
+  const peakHours = s.peakHours.map((h) => `${h}時`).join(", ");
+  const payload = `期間: ${s.period}
+総杯数: ${s.totalCups}
+会社負担合計: ¥${s.totalCompanyCost}
+自己負担合計: ¥${s.totalEmployeeCost}
+平均単価: ¥${s.avgUnitPrice}
+部署別Top3: ${topDepts}
+メニュー別Top3: ${topMenus}
+ピーク時間帯: ${peakHours}
+上限超過社員数: ${s.overBudgetEmployees}`;
+
+  return [
+    { role: "system" as const, content: SYSTEM_ADMIN_INSIGHT },
+    {
+      role: "user" as const,
+      content: `以下が当月の集計です。総務向けに要約してください。\n\n${payload}`,
     },
   ];
 }

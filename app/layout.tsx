@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
+import { EmployeeContextBar } from "./_components/EmployeeContextBar";
 import "./globals.css";
 
 const sans = Noto_Sans_JP({
@@ -31,6 +32,7 @@ export default function RootLayout({
       className={`${sans.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-espresso">
+        <EmployeeContextBar />
         {children}
       </body>
     </html>

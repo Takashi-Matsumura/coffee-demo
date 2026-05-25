@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { getCurrentEmployeeId } from "@/lib/employee-session";
 import type { DiagnoseMode } from "@/lib/types";
 
 type Props = {
@@ -11,12 +12,26 @@ type Props = {
   onRetry: () => void;
 };
 
+const ANSWERS_KEY = "occ_last_personal_answers";
+
 export function ResultCard({ title, mode, answers, onRetry }: Props) {
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"streaming" | "done" | "error">(
     "streaming",
   );
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (mode === "personal") {
+      setEmployeeId(getCurrentEmployeeId());
+      try {
+        sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
+      } catch {
+        // ignore
+      }
+    }
+  }, [mode, answers]);
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -47,6 +62,8 @@ export function ResultCard({ title, mode, answers, onRetry }: Props) {
     })();
   }, [mode, answers]);
 
+  const showOrderCta = mode === "personal" && employeeId !== null;
+
   return (
     <div className="flex w-full max-w-3xl flex-col items-center">
       <span className="font-display text-xs uppercase tracking-[0.3em] text-coffee-light">
@@ -72,6 +89,24 @@ export function ResultCard({ title, mode, answers, onRetry }: Props) {
           ) : null}
         </div>
       </article>
+
+      {showOrderCta ? (
+        <div className="mt-8 w-full rounded-3xl border border-mint/40 bg-mint/10 p-5 text-center">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-coffee">
+            Employee Mode
+          </div>
+          <p className="mt-1 text-sm text-espresso/80">
+            この一杯を、社員 <span className="font-bold">{employeeId}</span> として注文できます。
+            福利厚生ポリシーで自動的に会社負担と自己負担を算出します。
+          </p>
+          <Link
+            href="/order/new"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-coffee px-6 py-3 text-sm font-medium text-cream transition hover:bg-espresso"
+          >
+            この一杯を注文する →
+          </Link>
+        </div>
+      ) : null}
 
       <div className="mt-10 flex flex-col items-center gap-4 md:flex-row">
         <button

@@ -1,0 +1,22 @@
+[
+  { "id": "emp_001", "name": "佐藤 美咲", "department": "営業部", "role": "シニア", "monthlyBenefitCups": 25, "avatarHue": 24 },
+  { "id": "emp_002", "name": "田中 大輔", "department": "営業部", "role": "リーダー", "monthlyBenefitCups": 30, "avatarHue": 8 },
+  { "id": "emp_003", "name": "鈴木 加奈", "department": "営業部", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 350 },
+  { "id": "emp_004", "name": "高橋 翔太", "department": "営業部", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 18 },
+  { "id": "emp_005", "name": "伊藤 由衣", "department": "開発部", "role": "テックリード", "monthlyBenefitCups": 30, "avatarHue": 198 },
+  { "id": "emp_006", "name": "渡辺 健一", "department": "開発部", "role": "シニア", "monthlyBenefitCups": 30, "avatarHue": 210 },
+  { "id": "emp_007", "name": "山本 一馬", "department": "開発部", "role": "メンバー", "monthlyBenefitCups": 30, "avatarHue": 220 },
+  { "id": "emp_008", "name": "中村 さくら", "department": "開発部", "role": "メンバー", "monthlyBenefitCups": 30, "avatarHue": 188 },
+  { "id": "emp_009", "name": "小林 直樹", "department": "企画部", "role": "マネージャー", "monthlyBenefitCups": 25, "avatarHue": 280 },
+  { "id": "emp_010", "name": "加藤 萌絵", "department": "企画部", "role": "シニア", "monthlyBenefitCups": 25, "avatarHue": 300 },
+  { "id": "emp_011", "name": "吉田 拓海", "department": "企画部", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 320 },
+  { "id": "emp_012", "name": "山田 結衣", "department": "バックオフィス", "role": "マネージャー", "monthlyBenefitCups": 15, "avatarHue": 120 },
+  { "id": "emp_013", "name": "森本 雅人", "department": "バックオフィス", "role": "メンバー", "monthlyBenefitCups": 15, "avatarHue": 140 },
+  { "id": "emp_014", "name": "池田 千夏", "department": "バックオフィス", "role": "メンバー", "monthlyBenefitCups": 15, "avatarHue": 100 },
+  { "id": "emp_015", "name": "松本 海斗", "department": "バックオフィス", "role": "メンバー", "monthlyBenefitCups": 15, "avatarHue": 160 },
+  { "id": "emp_016", "name": "井上 美月", "department": "カスタマーサクセス", "role": "リーダー", "monthlyBenefitCups": 25, "avatarHue": 40 },
+  { "id": "emp_017", "name": "藤田 涼介", "department": "カスタマーサクセス", "role": "シニア", "monthlyBenefitCups": 25, "avatarHue": 60 },
+  { "id": "emp_018", "name": "斎藤 真央", "department": "カスタマーサクセス", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 50 },
+  { "id": "emp_019", "name": "村上 蓮", "department": "カスタマーサクセス", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 30 },
+  { "id": "emp_020", "name": "野口 葵", "department": "カスタマーサクセス", "role": "メンバー", "monthlyBenefitCups": 25, "avatarHue": 70 }
+]

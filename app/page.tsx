@@ -1,67 +1,128 @@
 import Link from "next/link";
+import { IntegrationBadges } from "./_components/IntegrationBadges";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 md:py-16">
-      <div className="flex flex-col items-center text-center max-w-5xl">
+    <main className="flex flex-1 flex-col items-center px-6 py-10 md:py-14">
+      <div className="flex w-full max-w-5xl flex-col items-center text-center">
         <span className="inline-flex items-center gap-2 rounded-full border border-coffee/20 bg-cream-soft px-4 py-1.5 text-sm text-coffee">
           <span className="size-2 rounded-full bg-mint" />
           Local AI Demo — gemma on Mac Studio
         </span>
 
-        <h1 className="font-display mt-6 text-5xl font-bold leading-tight text-espresso md:text-7xl">
+        <h1 className="font-display mt-5 text-5xl font-bold leading-tight text-espresso md:text-7xl">
           Office Coffee
           <br />
           Compass
         </h1>
 
-        <p className="mt-5 max-w-xl text-base text-espresso/70 md:text-lg">
-          AIが、あなたとあなたのオフィスにぴったりのコーヒーを「占う」。
+        <p className="mt-4 max-w-xl text-base text-espresso/70 md:text-lg">
+          AIが「占う」一杯から、オフィス全体のデータ連携まで。
           <br className="hidden md:block" />
-          4つのモードから、いまの気分に合う診断をどうぞ。
+          6つのモードで、機材とITが繋がる体験を。
         </p>
 
-        <div className="mt-10 grid w-full max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
-          <ModeCard
-            href="/diagnose/personal"
-            tag="Personal"
-            title="今日のあなたに、この一杯。"
-            description="気分とシーンを3タップ。あなたに合うコーヒーをAIが提案します。"
-            accent="from-coffee to-espresso"
-            tapHint="個人診断"
-          />
-          <ModeCard
-            href="/diagnose/team"
-            tag="Team"
-            title="あなたのチーム、何型？"
-            description="チーム規模と働き方から、オフィス全体のコーヒー像を診断します。"
-            accent="from-coffee-light to-coffee"
-            tapHint="チーム診断"
-          />
-          <ModeCard
-            href="/diagnose/department"
-            tag="Department"
-            title="部署ごとの、コーヒー処方箋。"
-            description="営業・開発・バックオフィスなど部署特性に合わせた処方箋を作成します。"
-            accent="from-mint to-coffee-light"
-            tapHint="部署診断"
-          />
-          <ModeCard
-            href="/diagnose/meeting"
-            tag="Meeting"
-            title="会議に効く、コーヒー設計。"
-            description="会議の目的と人数から、最適なコーヒー提供プランを設計します。"
-            accent="from-crema to-coffee"
-            tapHint="会議診断"
-          />
-        </div>
+        <Section
+          eyebrow="Fortune"
+          title="占い体験"
+          description="気分やシーンを答えるだけ。AIが言葉でコーヒーを紡ぎます。"
+        >
+          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+            <ModeCard
+              href="/diagnose/personal"
+              tag="Personal"
+              title="今日のあなたに、この一杯。"
+              description="気分とシーンを3タップ。あなたに合うコーヒーをAIが提案します。"
+              accent="from-coffee to-espresso"
+              tapHint="個人診断"
+            />
+            <ModeCard
+              href="/diagnose/team"
+              tag="Team"
+              title="あなたのチーム、何型？"
+              description="チーム規模と働き方から、オフィス全体のコーヒー像を診断します。"
+              accent="from-coffee-light to-coffee"
+              tapHint="チーム診断"
+            />
+            <ModeCard
+              href="/diagnose/department"
+              tag="Department"
+              title="部署ごとの、コーヒー処方箋。"
+              description="営業・開発・バックオフィスなど部署特性に合わせた処方箋を作成します。"
+              accent="from-mint to-coffee-light"
+              tapHint="部署診断"
+            />
+            <ModeCard
+              href="/diagnose/meeting"
+              tag="Meeting"
+              title="会議に効く、コーヒー設計。"
+              description="会議の目的と人数から、最適なコーヒー提供プランを設計します。"
+              accent="from-crema to-coffee"
+              tapHint="会議診断"
+            />
+          </div>
+        </Section>
 
-        <p className="mt-10 text-xs text-espresso/40">
+        <Section
+          eyebrow="Workflow"
+          title="業務体験"
+          description="社員として注文し、総務として全社の利用を見守る。福利厚生と社内データ連携を体験できます。"
+        >
+          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+            <ModeCard
+              href="/employee"
+              tag="Employee"
+              title="社員として注文する。"
+              description="架空社員でログインし、AI診断→注文→会社負担計算までを体験できます。"
+              accent="from-mint to-coffee"
+              tapHint="社員モードを開く"
+            />
+            <ModeCard
+              href="/admin"
+              tag="Admin"
+              title="総務として全社を見る。"
+              description="部署別の利用状況、福利厚生コスト、AIによる傾向要約を確認できます。"
+              accent="from-espresso to-coffee-light"
+              tapHint="総務ダッシュボードへ"
+            />
+          </div>
+        </Section>
+
+        <IntegrationBadges keys={["hr", "policy", "expense", "slack", "bi"]} />
+
+        <p className="mt-8 text-xs text-espresso/40">
           このデモは外部のクラウドAIを使用せず、ブース内のMac
           Studio上のローカルAIで動作しています。
         </p>
       </div>
     </main>
+  );
+}
+
+function Section({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-12 w-full">
+      <div className="mb-5 flex flex-col items-center">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-coffee-light">
+          {eyebrow}
+        </span>
+        <h2 className="font-display mt-1 text-2xl font-bold text-espresso md:text-3xl">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-xl text-sm text-espresso/60">{description}</p>
+      </div>
+      {children}
+    </section>
   );
 }
 

@@ -1,0 +1,15 @@
+{
+  "policyName": "Office Brew Benefit 2026",
+  "description": "月内の累計杯数に応じて会社負担割合が変わります。部署ごとに上限を調整可能。",
+  "default": {
+    "fullCoverageCups": 20,
+    "halfCoverageCups": 10
+  },
+  "departmentOverrides": {
+    "営業部": { "fullCoverageCups": 25, "halfCoverageCups": 10 },
+    "開発部": { "fullCoverageCups": 30, "halfCoverageCups": 10 },
+    "企画部": { "fullCoverageCups": 25, "halfCoverageCups": 10 },
+    "バックオフィス": { "fullCoverageCups": 15, "halfCoverageCups": 10 },
+    "カスタマーサクセス": { "fullCoverageCups": 25, "halfCoverageCups": 10 }
+  }
+}
