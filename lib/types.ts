@@ -10,6 +10,22 @@ export type TeamAnswers = {
   meetings: string;
 };
 
+export type DepartmentAnswers = {
+  department: string;
+  size: string;
+  style: string;
+};
+
+export type MeetingAnswers = {
+  meetingType: string;
+  attendees: string;
+  timing: string;
+};
+
+export type DiagnoseMode = "personal" | "team" | "department" | "meeting";
+
 export type DiagnoseRequest =
   | { mode: "personal"; answers: PersonalAnswers }
-  | { mode: "team"; answers: TeamAnswers };
+  | { mode: "team"; answers: TeamAnswers }
+  | { mode: "department"; answers: DepartmentAnswers }
+  | { mode: "meeting"; answers: MeetingAnswers };

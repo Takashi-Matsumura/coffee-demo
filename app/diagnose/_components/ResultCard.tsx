@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import type { DiagnoseMode } from "@/lib/types";
 
 type Props = {
   title: string;
-  mode: "personal" | "team";
+  mode: DiagnoseMode;
   answers: Record<string, string>;
   onRetry: () => void;
 };

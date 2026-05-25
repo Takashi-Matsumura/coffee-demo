@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { DiagnoseMode } from "@/lib/types";
 import { ResultCard } from "./ResultCard";
 
 export type Choice = { value: string; label: string; hint?: string };
@@ -11,7 +12,7 @@ type Props = {
   title: string;
   subtitle: string;
   steps: Step[];
-  mode: "personal" | "team";
+  mode: DiagnoseMode;
   resultTitle: string;
 };
 
