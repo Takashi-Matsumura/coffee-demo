@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdVideoPlayer } from "./_components/AdVideoPlayer";
 import { IntegrationBadges } from "./_components/IntegrationBadges";
 
 export default function Home() {
@@ -27,7 +28,11 @@ export default function Home() {
             <IntegrationBadges keys={["hr", "policy", "expense", "slack", "bi"]} />
           </div>
 
-          <p className="mt-6 text-xs text-espresso/40">
+          <div className="mt-6 w-full">
+            <AdVideoPlayer />
+          </div>
+
+          <p className="mt-4 text-xs text-espresso/40">
             このデモは外部のクラウドAIを使用せず、ブース内のMac
             Studio上のローカルAIで動作しています。
           </p>
