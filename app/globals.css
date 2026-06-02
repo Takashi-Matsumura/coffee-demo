@@ -27,6 +27,15 @@ body {
     var(--color-cream);
   color: var(--color-espresso);
   font-family: var(--font-sans);
+  /* 折り返しは JaBalance（BudouX）で制御する。ここでは末尾の孤立行だけ抑制する。 */
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3 {
+  /* BudouX が入れた改行候補を使って各行長を均す（見出しの 1 文字孤立を回避） */
+  text-wrap: balance;
 }
 
 .font-display {
