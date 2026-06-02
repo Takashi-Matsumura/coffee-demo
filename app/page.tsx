@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AdVideoPlayer } from "./_components/AdVideoPlayer";
-import { IntegrationBadges } from "./_components/IntegrationBadges";
 import { HomeDeck } from "./_components/HomeDeck";
+import { JaBalance } from "./_components/JaBalance";
 
 export default function Home() {
   return <HomeDeck homeSlide={<HomeContent />} />;
@@ -23,14 +23,12 @@ function HomeContent() {
         </h1>
 
         <p className="mt-4 max-w-xl text-base text-espresso/70 md:text-lg">
-          AIが「占う」一杯から、オフィス全体のデータ連携まで。
+          <JaBalance>
+            AIが「占う」一杯から、オフィス全体のデータ連携まで。
+          </JaBalance>
           <br className="hidden md:block" />
-          6つのモードで、機材とITが繋がる体験を。
+          <JaBalance>6つのモードで、機材とITが繋がる体験を。</JaBalance>
         </p>
-
-        <div className="mt-6 w-full">
-          <IntegrationBadges keys={["hr", "policy", "expense", "slack", "bi"]} />
-        </div>
 
         <div className="mt-6 w-full">
           <AdVideoPlayer />
@@ -133,7 +131,9 @@ function Section({
         <h2 className="font-display mt-1 text-2xl font-bold text-espresso md:text-3xl">
           {title}
         </h2>
-        <p className="mt-1.5 max-w-xl text-sm text-espresso/60">{description}</p>
+        <p className="mt-1.5 max-w-xl text-sm text-espresso/60">
+          <JaBalance>{description}</JaBalance>
+        </p>
       </div>
       {children}
     </section>
@@ -167,10 +167,10 @@ function ModeCard({
         {tag}
       </span>
       <h2 className="font-display mt-1.5 text-xl font-bold text-espresso md:text-[1.35rem]">
-        {title}
+        <JaBalance>{title}</JaBalance>
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-espresso/70">
-        {description}
+        <JaBalance>{description}</JaBalance>
       </p>
       <span className="mt-4 inline-flex items-center gap-2 self-start rounded-full bg-espresso px-4 py-2 text-xs font-medium text-cream transition group-hover:bg-coffee">
         {tapHint}
