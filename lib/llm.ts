@@ -32,12 +32,60 @@ export async function streamLlamaChat(
   let buffer = "";
   let done = false;
 
+  // gemma-4-12B は thinking を `<|channel>thought\n<channel|>本文` という制御
+  // トークンで包んで返すが、llama.cpp(b9430時点) はこれを reasoning として
+  // 分離できず content にそのまま混ぜてくる（reasoning_format:none も効かない）。
+  // 本文開始マーカー `<channel|>` より前を破棄して落とす。マーカーを出さない
+  // モデル（e4b 等）は即座に素通しさせるため、制御プレフィックスの前方一致が
+  // 崩れた時点でゲートを解除する。詳細は README.md の llama.cpp 既知の問題を参照。
+  const CHANNEL_MARKER = "<channel|>";
+  const CTRL_PREFIX = "<|channel";
+  const MAX_PREFIX_BUFFER = 200;
+  let headerStripped = false;
+  let prefixBuffer = "";
+
+  // 本文チャンクを受け取り、制御プレフィックスを剥がした出力を返す。
+  // まだ判定中（バッファ保留）なら null を返す。
+  function stripChannelPrefix(text: string): string | null {
+    if (headerStripped) return text;
+    prefixBuffer += text;
+
+    const idx = prefixBuffer.indexOf(CHANNEL_MARKER);
+    if (idx !== -1) {
+      headerStripped = true;
+      const rest = prefixBuffer.slice(idx + CHANNEL_MARKER.length);
+      prefixBuffer = "";
+      return rest.length > 0 ? rest : null;
+    }
+
+    // 制御プレフィックスの途中なら、マーカー到着を待つ。
+    const stillMatching =
+      CTRL_PREFIX.startsWith(prefixBuffer) ||
+      prefixBuffer.startsWith(CTRL_PREFIX);
+    if (!stillMatching || prefixBuffer.length >= MAX_PREFIX_BUFFER) {
+      headerStripped = true;
+      const out = prefixBuffer;
+      prefixBuffer = "";
+      return out.length > 0 ? out : null;
+    }
+    return null;
+  }
+
   return new ReadableStream<string>({
     async pull(controller) {
       while (!done) {
         const { done: streamDone, value } = await reader.read();
         if (streamDone) {
           done = true;
+          // 判定が確定しないまま終了した残バッファ（マーカー無しモデルの
+          // 短い応答など）は本文として流し切る。
+          if (!headerStripped && prefixBuffer.length > 0) {
+            headerStripped = true;
+            const out = prefixBuffer;
+            prefixBuffer = "";
+            controller.enqueue(out);
+            return;
+          }
           break;
         }
         buffer += decoder.decode(value, { stream: true });
@@ -64,8 +112,11 @@ export async function streamLlamaChat(
         }
 
         if (deltas.length > 0) {
-          controller.enqueue(deltas.join(""));
-          return;
+          const out = stripChannelPrefix(deltas.join(""));
+          if (out) {
+            controller.enqueue(out);
+            return;
+          }
         }
       }
       controller.close();

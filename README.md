@@ -171,6 +171,44 @@ scripts/
 - 「経費精算 SaaS に送信」「Slack に通知」などのアクションは外部に実送信しません（200 を返すだけのモック）。
 - セッション中の注文は `globalThis` 上のインメモリストアに保存され、サーバ再起動で消えます（シードデータは残ります）。
 
+## llama.cpp 既知の問題（gemma-4-12B）
+
+`gemma-4-12b-it`（unsloth GGUF）を使う場合、**llama.cpp 側が gemma-4-12B の新仕様にまだ対応していない**ため、以下の制約があります（検証時点 llama.cpp **b9430 / d48a56eff**）。
+
+| 症状 | 内容 |
+|---|---|
+| **思考トークンの混入** | 12B は thinking を `<\|channel>thought\n<channel\|>本文` という制御トークンで包んで返す。llama.cpp が reasoning として分離できず本文に混ざる。`reasoning_format:"none"` / `enable_thinking:false` も効かない。 |
+| **マルチモーダル不可** | mmproj の projector type `gemma4uv` が未実装で `unknown projector type: gemma4uv` で起動失敗。**12B の画像/音声機能は使用不可**（テキスト生成は正常）。 |
+
+> 4B 系（e4b など）はテンプレート形式が異なり、この問題は起きません。
+
+### 暫定対応（実装済み）
+
+`lib/llm.ts` の `streamLlamaChat` に **channel プレフィックス除去ゲート**（`stripChannelPrefix`）を実装しています。本文開始マーカー `<channel\|>` より前を破棄し、マーカーを出さないモデル（e4b 等）はそのまま素通しします。ストリームのチャンク境界でマーカーが分割されても正しく除去します。
+
+### ⚠️ llama.cpp 更新時に確認すること
+
+llama.cpp を新しいバージョンに上げたら、**この問題が公式に解決されたかを必ず確認**してください。
+
+```bash
+# 1) 更新
+brew upgrade llama.cpp && llama-server --version
+
+# 2) mmproj（gemma4uv）が読めるようになったか
+llama-server -m ~/.local/share/llama-models/gemma-4-12b-it/gemma-4-12b-it-Q4_K_M.gguf \
+  --mmproj ~/.local/share/llama-models/gemma-4-12b-it/mmproj-F16.gguf \
+  --host 127.0.0.1 --port 8082 -ngl 999
+#   → "unknown projector type: gemma4uv" が消えれば mmproj 対応
+
+# 3) channel トークンが分離されるようになったか（本文に制御トークンが出ないか）
+curl -s http://127.0.0.1:8082/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"一言で挨拶して"}],"max_tokens":64,"reasoning_format":"none"}' \
+  | python3 -c "import sys,json;print(repr(json.load(sys.stdin)['choices'][0]['message']['content']))"
+#   → 出力に "<|channel>" / "<channel|>" が含まれなければ解決
+```
+
+**両方が解決していれば、`lib/llm.ts` の `stripChannelPrefix` ゲートは撤去できます**（`reasoning_format:"none"` だけで本文が取れる状態に戻る）。
+
 ## ライセンス
 
 このリポジトリの著作物は MIT License で公開しています。
