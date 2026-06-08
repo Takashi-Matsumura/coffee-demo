@@ -1,49 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import {
+  renderStreamSections,
+  useStreamingText,
+} from "@/app/_components/streaming";
 
 export function InsightSection() {
-  const [text, setText] = useState("");
-  const [status, setStatus] = useState<"streaming" | "done" | "error">(
-    "streaming",
-  );
   const [reloadKey, setReloadKey] = useState(0);
-  const startedRef = useRef(false);
-
-  useEffect(() => {
-    startedRef.current = false;
-    setText("");
-    setStatus("streaming");
-  }, [reloadKey]);
-
-  useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/insight", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        });
-        if (!res.ok || !res.body) {
-          setStatus("error");
-          return;
-        }
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          setText((prev) => prev + decoder.decode(value, { stream: true }));
-        }
-        setStatus("done");
-      } catch {
-        setStatus("error");
-      }
-    })();
-  }, [reloadKey]);
+  const { text, status } = useStreamingText(
+    "/api/admin/insight",
+    {},
+    reloadKey,
+  );
 
   return (
     <section className="rounded-3xl bg-cream-soft p-6 shadow-sm ring-1 ring-coffee/10">
@@ -80,33 +49,14 @@ export function InsightSection() {
       </div>
 
       <div className="font-display mt-5 whitespace-pre-wrap text-base leading-8 text-espresso md:text-lg">
-        {renderSections(text)}
+        {renderStreamSections(
+          text,
+          "mt-3 block text-sm font-bold tracking-wider text-coffee md:text-base",
+        )}
         {status === "streaming" ? (
           <span className="ml-1 inline-block h-5 w-2 animate-pulse bg-coffee align-middle" />
         ) : null}
       </div>
     </section>
   );
-}
-
-function renderSections(text: string) {
-  if (!text) return null;
-  const parts = text.split(/(【[^】]+】)/g).filter(Boolean);
-  return parts.map((p, i) => {
-    if (/^【[^】]+】$/.test(p)) {
-      return (
-        <span
-          key={i}
-          className="mt-3 block text-sm font-bold tracking-wider text-coffee md:text-base"
-        >
-          {p}
-        </span>
-      );
-    }
-    return (
-      <span key={i} className="block">
-        {p.replace(/^\s+/, "")}
-      </span>
-    );
-  });
 }
