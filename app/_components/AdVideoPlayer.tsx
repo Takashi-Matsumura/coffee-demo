@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ads } from "@/lib/ads";
 
 export function AdVideoPlayer() {
@@ -11,9 +11,13 @@ export function AdVideoPlayer() {
   const hasAds = ads.length > 0;
   const current = hasAds ? ads[index % ads.length] : null;
 
-  useEffect(() => {
+  // 動画を切り替えたらエラー状態をリセットする（effect ではなくレンダー中に
+  // 前回 index と比較して同期する。https://react.dev/learn/you-might-not-need-an-effect）。
+  const [prevIndex, setPrevIndex] = useState(index);
+  if (index !== prevIndex) {
+    setPrevIndex(index);
     setErrored(false);
-  }, [index]);
+  }
 
   function next() {
     if (!hasAds) return;

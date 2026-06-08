@@ -1,12 +1,9 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import {
-  clearCurrentEmployeeId,
-  getCurrentEmployeeId,
-} from "@/lib/employee-session";
+import { clearCurrentEmployeeId } from "@/lib/employee-session";
 import { findEmployee } from "@/lib/employees";
+import { useCurrentEmployeeId } from "@/lib/use-current-employee";
 
 const SHOW_ON = [
   /^\/employee/,
@@ -17,24 +14,17 @@ const SHOW_ON = [
 export function EmployeeContextBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [employeeId, setEmployeeId] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const employeeId = useCurrentEmployeeId();
 
-  useEffect(() => {
-    setMounted(true);
-    setEmployeeId(getCurrentEmployeeId());
-  }, [pathname]);
-
-  if (!mounted) return null;
   if (!employeeId) return null;
   if (!SHOW_ON.some((re) => re.test(pathname))) return null;
 
   const emp = findEmployee(employeeId);
   if (!emp) return null;
 
+  // clearCurrentEmployeeId が購読者に通知するため employeeId は自動で null に戻る。
   function handleSwitch() {
     clearCurrentEmployeeId();
-    setEmployeeId(null);
     router.push("/employee");
   }
 
