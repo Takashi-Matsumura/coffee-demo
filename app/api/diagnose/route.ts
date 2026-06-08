@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { fallbackStream, streamLlamaChat } from "@/lib/llm";
+import { chatStreamResponse } from "@/lib/llm";
 import {
   buildDepartmentMessages,
   buildMeetingMessages,
@@ -63,27 +63,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let textStream: ReadableStream<string>;
-  try {
-    textStream = await streamLlamaChat(messages, req.signal);
-  } catch (err) {
-    console.warn("[diagnose] falling back:", err);
-    textStream = fallbackStream(fallback);
-  }
-
-  const encoder = new TextEncoder();
-  const bodyStream = textStream.pipeThrough(
-    new TransformStream<string, Uint8Array>({
-      transform(chunk, controller) {
-        controller.enqueue(encoder.encode(chunk));
-      },
-    }),
-  );
-
-  return new Response(bodyStream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
+  return chatStreamResponse(messages, {
+    fallback,
+    logTag: "diagnose",
+    signal: req.signal,
   });
 }

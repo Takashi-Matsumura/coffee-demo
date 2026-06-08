@@ -128,6 +128,37 @@ export async function streamLlamaChat(
   });
 }
 
+// llama.cpp への問い合わせと、失敗時のフォールバックを 1 つの text/plain
+// ストリーミング Response にまとめる。診断系の各ルートはこの応答形を共有する。
+export async function chatStreamResponse(
+  messages: ChatMessage[],
+  { fallback, logTag, signal }: { fallback: string; logTag: string; signal?: AbortSignal },
+): Promise<Response> {
+  let textStream: ReadableStream<string>;
+  try {
+    textStream = await streamLlamaChat(messages, signal);
+  } catch (err) {
+    console.warn(`[${logTag}] falling back:`, err);
+    textStream = fallbackStream(fallback);
+  }
+
+  const encoder = new TextEncoder();
+  const bodyStream = textStream.pipeThrough(
+    new TransformStream<string, Uint8Array>({
+      transform(chunk, controller) {
+        controller.enqueue(encoder.encode(chunk));
+      },
+    }),
+  );
+
+  return new Response(bodyStream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 export function fallbackStream(text: string): ReadableStream<string> {
   const chars = Array.from(text);
   let i = 0;

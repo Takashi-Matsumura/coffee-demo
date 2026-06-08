@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  renderStreamSections,
+  useStreamingText,
+} from "@/app/_components/streaming";
 import { getCurrentEmployeeId } from "@/lib/employee-session";
 import type { DiagnoseMode } from "@/lib/types";
 
@@ -15,12 +19,8 @@ type Props = {
 const ANSWERS_KEY = "occ_last_personal_answers";
 
 export function ResultCard({ title, mode, answers, onRetry }: Props) {
-  const [text, setText] = useState("");
-  const [status, setStatus] = useState<"streaming" | "done" | "error">(
-    "streaming",
-  );
   const [employeeId, setEmployeeId] = useState<string | null>(null);
-  const startedRef = useRef(false);
+  const { text, status } = useStreamingText("/api/diagnose", { mode, answers });
 
   useEffect(() => {
     if (mode === "personal") {
@@ -31,35 +31,6 @@ export function ResultCard({ title, mode, answers, onRetry }: Props) {
         // ignore
       }
     }
-  }, [mode, answers]);
-
-  useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-
-    (async () => {
-      try {
-        const res = await fetch("/api/diagnose", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode, answers }),
-        });
-        if (!res.ok || !res.body) {
-          setStatus("error");
-          return;
-        }
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          setText((prev) => prev + decoder.decode(value, { stream: true }));
-        }
-        setStatus("done");
-      } catch {
-        setStatus("error");
-      }
-    })();
   }, [mode, answers]);
 
   const showOrderCta = mode === "personal" && employeeId !== null;
@@ -83,7 +54,10 @@ export function ResultCard({ title, mode, answers, onRetry }: Props) {
         </div>
 
         <div className="font-display mt-8 whitespace-pre-wrap text-lg leading-9 text-espresso md:text-xl">
-          {renderSections(text)}
+          {renderStreamSections(
+            text,
+            "mt-4 block text-base font-bold tracking-wider text-coffee md:text-lg",
+          )}
           {status === "streaming" ? (
             <span className="ml-1 inline-block h-6 w-2 animate-pulse bg-coffee align-middle" />
           ) : null}
@@ -125,28 +99,6 @@ export function ResultCard({ title, mode, answers, onRetry }: Props) {
       </div>
     </div>
   );
-}
-
-function renderSections(text: string) {
-  if (!text) return null;
-  const parts = text.split(/(【[^】]+】)/g).filter(Boolean);
-  return parts.map((p, i) => {
-    if (/^【[^】]+】$/.test(p)) {
-      return (
-        <span
-          key={i}
-          className="mt-4 block text-base font-bold tracking-wider text-coffee md:text-lg"
-        >
-          {p}
-        </span>
-      );
-    }
-    return (
-      <span key={i} className="block">
-        {p.replace(/^\s+/, "")}
-      </span>
-    );
-  });
 }
 
 function Cup({ spinning }: { spinning: boolean }) {

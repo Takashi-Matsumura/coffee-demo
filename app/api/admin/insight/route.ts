@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { buildSummary } from "@/lib/aggregate";
-import { fallbackStream, streamLlamaChat } from "@/lib/llm";
+import { chatStreamResponse } from "@/lib/llm";
 import { buildAdminInsightMessages } from "@/lib/prompts";
 
 export const runtime = "nodejs";
@@ -24,27 +24,9 @@ export async function POST(req: NextRequest) {
   const summary = buildSummary(monthKey);
   const messages = buildAdminInsightMessages(summary);
 
-  let textStream: ReadableStream<string>;
-  try {
-    textStream = await streamLlamaChat(messages, req.signal);
-  } catch (err) {
-    console.warn("[admin/insight] falling back:", err);
-    textStream = fallbackStream(FALLBACK);
-  }
-
-  const encoder = new TextEncoder();
-  const bodyStream = textStream.pipeThrough(
-    new TransformStream<string, Uint8Array>({
-      transform(chunk, controller) {
-        controller.enqueue(encoder.encode(chunk));
-      },
-    }),
-  );
-
-  return new Response(bodyStream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
+  return chatStreamResponse(messages, {
+    fallback: FALLBACK,
+    logTag: "admin/insight",
+    signal: req.signal,
   });
 }
