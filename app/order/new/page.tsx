@@ -2,49 +2,35 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { IntegrationBadges } from "@/app/_components/IntegrationBadges";
-import { getCurrentEmployeeId } from "@/lib/employee-session";
 import { listEmployees } from "@/lib/employees";
 import { matchMenu, type MenuMatch } from "@/lib/menu";
-import type { Employee, PersonalAnswers } from "@/lib/types";
-
-const ANSWERS_KEY = "occ_last_personal_answers";
+import { useStoredPersonalAnswers } from "@/lib/personal-answers";
+import { useCurrentEmployeeId } from "@/lib/use-current-employee";
 
 export default function OrderNewPage() {
   const router = useRouter();
-  const [employee, setEmployee] = useState<Employee | null>(null);
-  const [answers, setAnswers] = useState<PersonalAnswers | null>(null);
+  const employeeId = useCurrentEmployeeId();
+  const answers = useStoredPersonalAnswers();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const id = getCurrentEmployeeId();
-    const emp = id ? listEmployees().find((e) => e.id === id) ?? null : null;
-    setEmployee(emp);
-
-    try {
-      const raw = sessionStorage.getItem(ANSWERS_KEY);
-      if (raw) setAnswers(JSON.parse(raw) as PersonalAnswers);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const employee = employeeId
+    ? listEmployees().find((e) => e.id === employeeId) ?? null
+    : null;
 
   const recommendations: MenuMatch[] = useMemo(
     () => (answers ? matchMenu(answers, 3) : []),
     [answers],
   );
 
-  useEffect(() => {
-    if (recommendations.length > 0 && !selectedId) {
-      setSelectedId(recommendations[0].item.id);
-    }
-  }, [recommendations, selectedId]);
+  // 既定では先頭の推薦を選択扱いにする（effect での同期は不要）。
+  const effectiveSelectedId = selectedId ?? recommendations[0]?.item.id ?? null;
 
   async function handleConfirm() {
-    if (!employee || !selectedId) return;
+    if (!employee || !effectiveSelectedId) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -53,7 +39,7 @@ export default function OrderNewPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           employeeId: employee.id,
-          menuId: selectedId,
+          menuId: effectiveSelectedId,
         }),
       });
       if (!res.ok) {
@@ -136,7 +122,7 @@ export default function OrderNewPage() {
               key={m.item.id}
               rank={idx + 1}
               menu={m}
-              selected={selectedId === m.item.id}
+              selected={effectiveSelectedId === m.item.id}
               onSelect={() => setSelectedId(m.item.id)}
             />
           ))}
@@ -165,7 +151,7 @@ export default function OrderNewPage() {
         <div className="mt-8 flex justify-center">
           <button
             type="button"
-            disabled={!selectedId || submitting}
+            disabled={!effectiveSelectedId || submitting}
             onClick={handleConfirm}
             className="rounded-full bg-coffee px-8 py-3 text-sm font-medium text-cream transition hover:bg-espresso disabled:bg-coffee/40"
           >

@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   renderStreamSections,
   useStreamingText,
 } from "@/app/_components/streaming";
-import { getCurrentEmployeeId } from "@/lib/employee-session";
+import { useCurrentEmployeeId } from "@/lib/use-current-employee";
 import type { DiagnoseMode } from "@/lib/types";
 
 type Props = {
@@ -19,17 +19,16 @@ type Props = {
 const ANSWERS_KEY = "occ_last_personal_answers";
 
 export function ResultCard({ title, mode, answers, onRetry }: Props) {
-  const [employeeId, setEmployeeId] = useState<string | null>(null);
+  const employeeId = useCurrentEmployeeId();
   const { text, status } = useStreamingText("/api/diagnose", { mode, answers });
 
+  // personal モードのときだけ、注文ページへ引き継ぐ回答を保存する。
   useEffect(() => {
-    if (mode === "personal") {
-      setEmployeeId(getCurrentEmployeeId());
-      try {
-        sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
-      } catch {
-        // ignore
-      }
+    if (mode !== "personal") return;
+    try {
+      sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
+    } catch {
+      // ignore
     }
   }, [mode, answers]);
 
