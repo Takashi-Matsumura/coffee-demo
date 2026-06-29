@@ -175,7 +175,12 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
 
       {/* 操作フッター（スワイプ領域の外なのでタップが確実に効く）。
           戻る／主要ボタン（アンケートを始める・次へ・回答を送信）＋進捗ガイド。 */}
-      <nav className="flex shrink-0 flex-col items-center gap-3 border-t border-coffee/10 bg-cream-soft/80 py-4 backdrop-blur">
+      <nav
+        className="flex shrink-0 flex-col items-center gap-3 border-t border-coffee/10 bg-cream-soft/80 pt-4 backdrop-blur"
+        // iOS PWA のホームインジケータ領域にボタンが重なるとタップがシステムに
+        // 奪われるため、セーフエリア分＋αの下余白を確保して持ち上げる。
+        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
+      >
         <div className="flex w-full max-w-2xl items-center justify-between gap-3 px-4">
           {/* 戻る（ホームでは非表示。レイアウト維持のため場所だけ残す） */}
           <button

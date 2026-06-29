@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import { EmployeeContextBar } from "./_components/EmployeeContextBar";
 import "./globals.css";
@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   title: "Office Coffee Compass｜AIが選ぶ、あなたとチームの一杯",
   description:
     "ローカルAIがその場で診断する、オフィス向けコーヒー体験デモ。",
+};
+
+// viewport-fit=cover にすると env(safe-area-inset-*) が有効になり、
+// iOS PWA でホームインジケータ領域を避けた余白計算ができる。
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
