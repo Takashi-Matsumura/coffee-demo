@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import { EmployeeContextBar } from "./_components/EmployeeContextBar";
+import { FullscreenToggle } from "./_components/FullscreenToggle";
 import "./globals.css";
 
 const sans = Noto_Sans_JP({
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-cream text-espresso">
         <EmployeeContextBar />
         {children}
+        <FullscreenToggle />
       </body>
     </html>
   );
