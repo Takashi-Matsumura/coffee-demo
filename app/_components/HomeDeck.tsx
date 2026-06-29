@@ -14,6 +14,11 @@ const COMPLETE_INDEX = QUESTIONS.length + 1; // 0:ホーム, 1..N:設問, N+1:�
 const LAST_INDEX = COMPLETE_INDEX;
 const TOTAL_SLIDES = COMPLETE_INDEX + 1;
 
+// 指タップは数px〜十数pxブレるため、これ未満の移動は「スワイプ」ではなく
+// 「タップ」とみなす（iOS 標準のタップ許容に合わせる）。低すぎるとタップが
+// スワイプ誤判定されてボタンが反応しなくなる。
+const TAP_SLOP = 12;
+
 export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -85,7 +90,11 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
     if (!downRef.current) return;
     const dx = e.clientX - startXRef.current;
     const dy = e.clientY - startYRef.current;
-    if (!movedRef.current && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+    if (
+      !movedRef.current &&
+      Math.abs(dx) > TAP_SLOP &&
+      Math.abs(dx) > Math.abs(dy)
+    ) {
       movedRef.current = true;
     }
     if (!movedRef.current) return;
@@ -117,6 +126,12 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
       movedRef.current = false;
     }
   }
+
+  // 実際にスワイプ移動している間（dragPx≠0）はナビボタンを視覚的に隠すが、
+  // DOM からは外さない。アンマウントするとタップ中にボタンが消え、click が
+  // どこにも着地せず無反応になるため。
+  const navHiddenWhileDragging =
+    dragPx !== 0 ? "pointer-events-none opacity-0" : "";
 
   return (
     <div className="relative flex h-[100dvh] flex-col">
@@ -163,23 +178,23 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
         </div>
 
         {/* 大型ナビ矢印（ドラッグ中は dragPx≠0 なので隠れ、タップ時は残る） */}
-        {index > 0 && dragPx === 0 && (
+        {index > 0 && (
           <button
             type="button"
             onClick={() => goTo(index - 1)}
             aria-label="前へ戻る"
-            className="absolute left-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso/85 text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:left-6"
+            className={`absolute left-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso/85 text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:left-6 ${navHiddenWhileDragging}`}
           >
             ←
           </button>
         )}
 
-        {index === 0 && dragPx === 0 && (
+        {index === 0 && (
           <button
             type="button"
             onClick={() => goTo(1)}
             aria-label="アンケートへ進む"
-            className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-1 rounded-3xl bg-espresso px-6 py-5 text-cream shadow-xl transition hover:bg-coffee active:scale-95 md:right-6"
+            className={`absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-1 rounded-3xl bg-espresso px-6 py-5 text-cream shadow-xl transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
           >
             <span className="animate-pulse text-3xl leading-none">→</span>
             <span className="text-xs font-semibold tracking-widest">
@@ -188,12 +203,12 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
           </button>
         )}
 
-        {index > 0 && index < LAST_INDEX && dragPx === 0 && (
+        {index > 0 && index < LAST_INDEX && (
           <button
             type="button"
             onClick={() => goTo(index + 1)}
             aria-label={index === COMPLETE_INDEX - 1 ? "回答を送信" : "次へ進む"}
-            className="absolute right-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:right-6"
+            className={`absolute right-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
           >
             →
           </button>
