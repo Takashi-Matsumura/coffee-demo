@@ -129,6 +129,64 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
 
   return (
     <div className="relative flex h-[100dvh] flex-col">
+      {/* 操作バー（画面上部）。下端のホームインジケータ領域だとタップが
+          システムに奪われるため、確実にタップできる上部へ配置する。
+          戻る／進捗ガイド／主要ボタン（アンケートを始める・次へ・送信・リセット）。 */}
+      <nav
+        className="flex shrink-0 items-center justify-between gap-3 border-b border-coffee/10 bg-cream-soft/85 px-4 pb-3 backdrop-blur"
+        style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
+      >
+        {/* 戻る（ホームでは非表示。レイアウト維持のため場所だけ残す） */}
+        <button
+          type="button"
+          onClick={() => goTo(index - 1)}
+          disabled={index === 0}
+          aria-label="前へ戻る"
+          className="shrink-0 touch-manipulation rounded-full border border-coffee/30 px-4 py-2 text-sm font-medium text-espresso transition enabled:hover:bg-cream disabled:invisible"
+        >
+          ← 戻る
+        </button>
+
+        {/* スライド進捗ガイド（タップで各スライドへジャンプ可能） */}
+        <div className="flex items-center justify-center gap-2">
+          {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`スライド ${i + 1}`}
+              className={`h-2.5 touch-manipulation rounded-full transition-all ${
+                i === index ? "w-7 bg-coffee" : "w-2.5 bg-coffee/25"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* 主要ボタン: ホーム→アンケート開始 / 設問→次へ / 最終設問→送信 / 完了→リセット */}
+        {index < COMPLETE_INDEX ? (
+          <button
+            type="button"
+            onClick={() => goTo(index + 1)}
+            className="flex shrink-0 touch-manipulation items-center gap-2 rounded-full bg-espresso px-5 py-2.5 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
+          >
+            {index === 0
+              ? "アンケートを始める"
+              : index === COMPLETE_INDEX - 1
+                ? "回答を送信"
+                : "次へ"}
+            <span aria-hidden>→</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={reset}
+            className="shrink-0 touch-manipulation rounded-full bg-espresso px-5 py-2.5 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
+          >
+            最初に戻る
+          </button>
+        )}
+      </nav>
+
       <div
         ref={containerRef}
         className="relative min-h-0 flex-1 overflow-hidden"
@@ -170,69 +228,7 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
           {/* 最終スライド: 完了 */}
           <CompleteSlide onReset={reset} />
         </div>
-
       </div>
-
-      {/* 操作フッター（スワイプ領域の外なのでタップが確実に効く）。
-          戻る／主要ボタン（アンケートを始める・次へ・回答を送信）＋進捗ガイド。 */}
-      <nav
-        className="flex shrink-0 flex-col items-center gap-3 border-t border-coffee/10 bg-cream-soft/80 pt-4 backdrop-blur"
-        // iOS PWA のホームインジケータ領域にボタンが重なるとタップがシステムに
-        // 奪われるため、セーフエリア分＋αの下余白を確保して持ち上げる。
-        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
-      >
-        <div className="flex w-full max-w-2xl items-center justify-between gap-3 px-4">
-          {/* 戻る（ホームでは非表示。レイアウト維持のため場所だけ残す） */}
-          <button
-            type="button"
-            onClick={() => goTo(index - 1)}
-            disabled={index === 0}
-            aria-label="前へ戻る"
-            className="touch-manipulation rounded-full border border-coffee/30 px-5 py-2.5 text-sm font-medium text-espresso transition enabled:hover:bg-cream disabled:invisible"
-          >
-            ← 戻る
-          </button>
-
-          {/* 主要ボタン: ホーム→アンケート開始 / 設問→次へ / 最終設問→送信 / 完了→リセット */}
-          {index < COMPLETE_INDEX ? (
-            <button
-              type="button"
-              onClick={() => goTo(index + 1)}
-              className="flex touch-manipulation items-center gap-2 rounded-full bg-espresso px-7 py-3 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
-            >
-              {index === 0
-                ? "アンケートを始める"
-                : index === COMPLETE_INDEX - 1
-                  ? "回答を送信"
-                  : "次へ"}
-              <span aria-hidden>→</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={reset}
-              className="touch-manipulation rounded-full bg-espresso px-7 py-3 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
-            >
-              最初に戻る
-            </button>
-          )}
-        </div>
-
-        {/* スライド進捗ガイド（タップで各スライドへジャンプ可能） */}
-        <div className="flex items-center justify-center gap-2">
-          {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`スライド ${i + 1}`}
-              className={`h-2.5 touch-manipulation rounded-full transition-all ${
-                i === index ? "w-7 bg-coffee" : "w-2.5 bg-coffee/25"
-              }`}
-            />
-          ))}
-        </div>
-      </nav>
     </div>
   );
 }
