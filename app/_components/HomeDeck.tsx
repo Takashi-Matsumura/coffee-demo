@@ -133,6 +133,14 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
   const navHiddenWhileDragging =
     dragPx !== 0 ? "pointer-events-none opacity-0" : "";
 
+  // ナビボタン上で始まったタッチはコンテナのスワイプ判定に渡さない。これにより
+  // 指の微ブレでスワイプ誤判定されてタップが無効化されるのを防ぐ。あわせて各
+  // ボタンに touch-none を付け、ブラウザが縦スクロール開始と誤認して click を
+  // キャンセルする挙動（iOS で起きやすい）も止める。
+  function stopGesture(e: React.PointerEvent) {
+    e.stopPropagation();
+  }
+
   return (
     <div className="relative flex h-[100dvh] flex-col">
       <div
@@ -181,9 +189,10 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
         {index > 0 && (
           <button
             type="button"
+            onPointerDown={stopGesture}
             onClick={() => goTo(index - 1)}
             aria-label="前へ戻る"
-            className={`absolute left-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso/85 text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:left-6 ${navHiddenWhileDragging}`}
+            className={`absolute left-3 top-1/2 z-10 flex size-16 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-espresso/85 text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:left-6 ${navHiddenWhileDragging}`}
           >
             ←
           </button>
@@ -192,9 +201,10 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
         {index === 0 && (
           <button
             type="button"
+            onPointerDown={stopGesture}
             onClick={() => goTo(1)}
             aria-label="アンケートへ進む"
-            className={`absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-1 rounded-3xl bg-espresso px-6 py-5 text-cream shadow-xl transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
+            className={`absolute right-3 top-1/2 z-10 flex -translate-y-1/2 touch-none flex-col items-center gap-1 rounded-3xl bg-espresso px-6 py-5 text-cream shadow-xl transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
           >
             <span className="animate-pulse text-3xl leading-none">→</span>
             <span className="text-xs font-semibold tracking-widest">
@@ -206,9 +216,10 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
         {index > 0 && index < LAST_INDEX && (
           <button
             type="button"
+            onPointerDown={stopGesture}
             onClick={() => goTo(index + 1)}
             aria-label={index === COMPLETE_INDEX - 1 ? "回答を送信" : "次へ進む"}
-            className={`absolute right-3 top-1/2 z-10 flex size-16 -translate-y-1/2 items-center justify-center rounded-full bg-espresso text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
+            className={`absolute right-3 top-1/2 z-10 flex size-16 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-espresso text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
           >
             →
           </button>
