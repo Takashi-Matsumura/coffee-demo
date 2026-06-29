@@ -127,20 +127,6 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
     }
   }
 
-  // 実際にスワイプ移動している間（dragPx≠0）はナビボタンを視覚的に隠すが、
-  // DOM からは外さない。アンマウントするとタップ中にボタンが消え、click が
-  // どこにも着地せず無反応になるため。
-  const navHiddenWhileDragging =
-    dragPx !== 0 ? "pointer-events-none opacity-0" : "";
-
-  // ナビボタン上で始まったタッチはコンテナのスワイプ判定に渡さない。これにより
-  // 指の微ブレでスワイプ誤判定されてタップが無効化されるのを防ぐ。あわせて各
-  // ボタンに touch-none を付け、ブラウザが縦スクロール開始と誤認して click を
-  // キャンセルする挙動（iOS で起きやすい）も止める。
-  function stopGesture(e: React.PointerEvent) {
-    e.stopPropagation();
-  }
-
   return (
     <div className="relative flex h-[100dvh] flex-col">
       <div
@@ -185,60 +171,62 @@ export function HomeDeck({ homeSlide }: { homeSlide: React.ReactNode }) {
           <CompleteSlide onReset={reset} />
         </div>
 
-        {/* 大型ナビ矢印（ドラッグ中は dragPx≠0 なので隠れ、タップ時は残る） */}
-        {index > 0 && (
-          <button
-            type="button"
-            onPointerDown={stopGesture}
-            onClick={() => goTo(index - 1)}
-            aria-label="前へ戻る"
-            className={`absolute left-3 top-1/2 z-10 flex size-16 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-espresso/85 text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:left-6 ${navHiddenWhileDragging}`}
-          >
-            ←
-          </button>
-        )}
-
-        {index === 0 && (
-          <button
-            type="button"
-            onPointerDown={stopGesture}
-            onClick={() => goTo(1)}
-            aria-label="アンケートへ進む"
-            className={`absolute right-3 top-1/2 z-10 flex -translate-y-1/2 touch-none flex-col items-center gap-1 rounded-3xl bg-espresso px-6 py-5 text-cream shadow-xl transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
-          >
-            <span className="animate-pulse text-3xl leading-none">→</span>
-            <span className="text-xs font-semibold tracking-widest">
-              アンケート
-            </span>
-          </button>
-        )}
-
-        {index > 0 && index < LAST_INDEX && (
-          <button
-            type="button"
-            onPointerDown={stopGesture}
-            onClick={() => goTo(index + 1)}
-            aria-label={index === COMPLETE_INDEX - 1 ? "回答を送信" : "次へ進む"}
-            className={`absolute right-3 top-1/2 z-10 flex size-16 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-espresso text-3xl text-cream shadow-lg transition hover:bg-coffee active:scale-95 md:right-6 ${navHiddenWhileDragging}`}
-          >
-            →
-          </button>
-        )}
       </div>
 
-      {/* 進捗インジケータ（常時表示・画面下部にピン留め） */}
-      <nav className="flex shrink-0 items-center justify-center gap-2 border-t border-coffee/10 bg-cream-soft/80 py-4 backdrop-blur">
-        {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
+      {/* 操作フッター（スワイプ領域の外なのでタップが確実に効く）。
+          戻る／主要ボタン（アンケートを始める・次へ・回答を送信）＋進捗ガイド。 */}
+      <nav className="flex shrink-0 flex-col items-center gap-3 border-t border-coffee/10 bg-cream-soft/80 py-4 backdrop-blur">
+        <div className="flex w-full max-w-2xl items-center justify-between gap-3 px-4">
+          {/* 戻る（ホームでは非表示。レイアウト維持のため場所だけ残す） */}
           <button
-            key={i}
             type="button"
-            onClick={() => goTo(i)}
-            aria-label={`スライド ${i + 1}`}
-            className={`h-2.5 rounded-full transition-all ${
-              i === index ? "w-7 bg-coffee" : "w-2.5 bg-coffee/25"
-            }`}
-          />
-        ))}
+            onClick={() => goTo(index - 1)}
+            disabled={index === 0}
+            aria-label="前へ戻る"
+            className="touch-manipulation rounded-full border border-coffee/30 px-5 py-2.5 text-sm font-medium text-espresso transition enabled:hover:bg-cream disabled:invisible"
+          >
+            ← 戻る
+          </button>
+
+          {/* 主要ボタン: ホーム→アンケート開始 / 設問→次へ / 最終設問→送信 / 完了→リセット */}
+          {index < COMPLETE_INDEX ? (
+            <button
+              type="button"
+              onClick={() => goTo(index + 1)}
+              className="flex touch-manipulation items-center gap-2 rounded-full bg-espresso px-7 py-3 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
+            >
+              {index === 0
+                ? "アンケートを始める"
+                : index === COMPLETE_INDEX - 1
+                  ? "回答を送信"
+                  : "次へ"}
+              <span aria-hidden>→</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={reset}
+              className="touch-manipulation rounded-full bg-espresso px-7 py-3 text-sm font-semibold text-cream shadow-md transition hover:bg-coffee active:scale-95"
+            >
+              最初に戻る
+            </button>
+          )}
+        </div>
+
+        {/* スライド進捗ガイド（タップで各スライドへジャンプ可能） */}
+        <div className="flex items-center justify-center gap-2">
+          {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`スライド ${i + 1}`}
+              className={`h-2.5 touch-manipulation rounded-full transition-all ${
+                i === index ? "w-7 bg-coffee" : "w-2.5 bg-coffee/25"
+              }`}
+            />
+          ))}
+        </div>
       </nav>
     </div>
   );
