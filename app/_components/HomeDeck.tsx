@@ -250,7 +250,9 @@ function QuestionSlide({
 }) {
   return (
     <section className="h-full w-full shrink-0 overflow-y-auto">
-      <div className="mx-auto flex min-h-full max-w-2xl flex-col justify-center px-6 py-10">
+      {/* Q3/Q4 のタイトルは text-4xl だと max-w-2xl(実質~624px)の限界付近で
+          iOS の描画幅差により折り返していた。max-w-3xl(~720px)に広げて余裕を確保。 */}
+      <div className="mx-auto flex min-h-full max-w-3xl flex-col justify-center px-6 py-10">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-coffee-light">
             {question.eyebrow}
