@@ -260,7 +260,10 @@ function QuestionSlide({
           </span>
         </div>
 
-        <h2 className="font-display mt-2 text-3xl font-bold leading-tight text-espresso md:text-4xl">
+        {/* md 以上（iPad 横向き等）では1行固定。Q3/Q4 はコンテナ幅の限界付近で
+            iOS の描画幅差により折り返しやすいため、強制的に1行に保つ。
+            portrait(<md) は text-3xl で収まるので折り返し許可のまま。 */}
+        <h2 className="font-display mt-2 text-3xl font-bold leading-tight text-espresso md:whitespace-nowrap md:text-4xl">
           {question.title}
         </h2>
         {question.description && (
