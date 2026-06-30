@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Office Coffee Compass｜AIが選ぶ、あなたとチームの一杯",
   description:
     "ローカルAIがその場で診断する、オフィス向けコーヒー体験デモ。",
+  // iOS の「ホーム画面に追加」で standalone（アドレスバー無しの全画面）起動を有効化。
+  // mobile-web-app-capable / apple-mobile-web-app-* メタタグを出力する。
+  appleWebApp: {
+    capable: true,
+    title: "Coffee Compass",
+    statusBarStyle: "default",
+  },
 };
 
 // viewport-fit=cover にすると env(safe-area-inset-*) が有効になり、
